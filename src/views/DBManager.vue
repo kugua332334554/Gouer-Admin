@@ -116,9 +116,9 @@
               <v-spacer />
               <v-pagination
                 v-model="page"
-                :length="Math.ceil(totalRows / 50)"
+                :length="pageLength"
                 density="compact"
-                @update:model-value="loadTableData"
+                @update:model-value="onPageChange"
                 size="small"
               />
             </div>
@@ -156,9 +156,13 @@ const sqlQuery = ref('')
 const queryRunning = ref(false)
 const queryResult = ref(null)
 
+const pageLength = computed(() => Math.ceil(totalRows.value / 50) || 1)
+
 const dataHeaders = computed(() =>
   tableColumns.value.map(c => ({ title: c.field, key: c.field, width: 160 }))
 )
+
+let _requestId = 0
 
 async function loadDatabases() {
   try { databases.value = await api.get('/db/databases') } catch {}
@@ -192,29 +196,42 @@ async function loadTables() {
 async function selectTable(table) {
   selectedTable.value = table
   queryResult.value = null
-  page.value = 1
   try {
     const params = selectedDb.value ? { db: selectedDb.value } : {}
     const info = await api.get(`/db/tables/${table}`, { params })
     tableColumns.value = info.columns
     totalRows.value = info.row_count
-    await loadTableData()
+    // 如果 page 已是 1 则手动触发加载（v-model 不会触发事件），否则设 page=1 由事件触发
+    if (page.value === 1) {
+      await loadTableData(1)
+    } else {
+      page.value = 1
+    }
   } catch (e) {
     console.error(e)
   }
 }
 
-async function loadTableData() {
+function onPageChange(newPage) {
+  loadTableData(newPage)
+}
+
+async function loadTableData(newPage) {
+  if (newPage !== undefined) page.value = newPage
+  const reqId = ++_requestId
   loadingData.value = true
   try {
     const params = { page: page.value, limit: 50 }
     if (selectedDb.value) params.db = selectedDb.value
     const res = await api.get(`/db/tables/${selectedTable.value}/rows`, { params })
+    // 丢弃过期请求，防止竞态条件导致数据错乱
+    if (reqId !== _requestId) return
     tableRows.value = res.rows
+    totalRows.value = res.total   // 同步真实行数，确保翻页 length 准确
   } catch (e) {
     console.error(e)
   } finally {
-    loadingData.value = false
+    if (reqId === _requestId) loadingData.value = false
   }
 }
 

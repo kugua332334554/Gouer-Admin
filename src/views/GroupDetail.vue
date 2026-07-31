@@ -173,6 +173,28 @@
           </v-card-text>
         </v-card>
 
+        <!-- NSFW Detection -->
+        <v-card class="mb-4">
+          <v-card-item class="pb-0"><template #prepend><v-icon>mdi-shield-alert-outline</v-icon></template>
+            <v-card-title>NSFW 色情识别</v-card-title>
+            <template #append><v-switch v-model="group.nsfw.enabled" hide-details density="compact" @update:model-value="saveNsfw" /></template>
+          </v-card-item>
+          <v-card-text v-if="group.nsfw.enabled">
+            <v-select label="惩罚方式" v-model="group.nsfw.penalty" :items="[
+              { title: '仅删除', value: 'delete' },
+              { title: '禁言1小时', value: 'mute' },
+              { title: '踢出', value: 'kick' },
+              { title: '封禁', value: 'ban' }
+            ]" density="compact" hide-details @update:model-value="saveNsfw" />
+            <v-select label="检测阈值" v-model="group.nsfw.threshold" :items="[
+              { title: '0.6 (宽松)', value: 0.6 },
+              { title: '0.7 (适中)', value: 0.7 },
+              { title: '0.8 (推荐)', value: 0.8 },
+              { title: '0.9 (严格)', value: 0.9 }
+            ]" density="compact" hide-details class="mt-2" @update:model-value="saveNsfw" />
+          </v-card-text>
+        </v-card>
+
         <!-- Card -->
         <v-card class="mb-4">
           <v-card-item class="pb-0"><template #prepend><v-icon>mdi-credit-card-outline</v-icon></template>
@@ -239,6 +261,7 @@ const group = ref({
   points: { status: false, msg_points: 0, ignore_stickers: true },
   speak_check: { enabled: false, require_last_name: false, require_username: false, require_photo: false, require_premium: false },
   autodelete: { pin: false, photo: false, title: false, join_leave: false },
+  nsfw: { enabled: false, penalty: 'delete', threshold: 0.8 },
   card: { enabled: false },
   permission: 'all',
   subscriptions: [],
@@ -281,6 +304,7 @@ async function saveToggle() { try { await api.put(`/groups/${chatId.value}/toggl
 async function savePoints() { try { await api.put(`/groups/${chatId.value}/points`, group.value.points); showSnack('已保存') } catch (e) { showSnack(e.message, 'error') } }
 async function saveSpeakCheck() { try { await api.put(`/groups/${chatId.value}/speak-check`, group.value.speak_check); showSnack('已保存') } catch (e) { showSnack(e.message, 'error') } }
 async function saveAutodelete() { try { await api.put(`/groups/${chatId.value}/autodelete`, group.value.autodelete); showSnack('已保存') } catch (e) { showSnack(e.message, 'error') } }
+async function saveNsfw() { try { await api.put(`/groups/${chatId.value}/nsfw`, group.value.nsfw); showSnack('已保存') } catch (e) { showSnack(e.message, 'error') } }
 async function saveCard() { try { await api.put(`/groups/${chatId.value}/card`, group.value.card); showSnack('已保存') } catch (e) { showSnack(e.message, 'error') } }
 async function savePermission() { try { await api.put(`/groups/${chatId.value}/permission`, { permissions: group.value.permission }); showSnack('已保存') } catch (e) { showSnack(e.message, 'error') } }
 

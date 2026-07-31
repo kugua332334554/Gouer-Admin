@@ -50,6 +50,18 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/keyword-reply',
+    name: 'KeywordReply',
+    component: () => import('@/views/KeywordReply.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/shop',
+    name: 'Shop',
+    component: () => import('@/views/Shop.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/lotteries',
     name: 'Lotteries',
     component: () => import('@/views/Lotteries.vue'),

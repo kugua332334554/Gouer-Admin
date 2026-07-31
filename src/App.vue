@@ -78,6 +78,18 @@
           to="/weijinci"
         />
         <v-list-item
+          prepend-icon="mdi-key-variant"
+          title="关键词回复"
+          value="keyword-reply"
+          to="/keyword-reply"
+        />
+        <v-list-item
+          prepend-icon="mdi-cart"
+          title="积分商城"
+          value="shop"
+          to="/shop"
+        />
+        <v-list-item
           prepend-icon="mdi-ticket-confirmation"
           title="抽奖管理"
           value="lotteries"
@@ -147,6 +159,30 @@
 
         <v-spacer />
 
+        <!-- Bot selector — switch between main + clone bots -->
+        <v-select
+          v-if="botStore.bots.length >= 1"
+          :model-value="botStore.selectedBotId"
+          :items="botStore.bots"
+          item-title="bot_username"
+          item-value="id"
+          density="compact"
+          hide-details
+          variant="outlined"
+          style="max-width: 220px"
+          @update:model-value="onBotChange"
+        >
+          <template #item="{ item, props }">
+            <v-list-item v-bind="props">
+              <template #append>
+                <v-chip size="x-small" variant="tonal" class="ml-2">
+                  {{ item.raw.group_count }} 群
+                </v-chip>
+              </template>
+            </v-list-item>
+          </template>
+        </v-select>
+
         <v-btn
           :icon="theme.isDark ? 'mdi-weather-night' : 'mdi-weather-sunny'"
           variant="text"
@@ -178,7 +214,7 @@
       </v-app-bar>
 
       <v-container fluid class="pa-4">
-        <router-view />
+        <router-view :key="routerViewKey" />
       </v-container>
     </v-main>
 
@@ -212,14 +248,16 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
+import { useBotStore } from '@/stores/bot'
 import api from '@/api'
 
 const auth = useAuthStore()
 const theme = useThemeStore()
+const botStore = useBotStore()
 const router = useRouter()
 const route = useRoute()
 
@@ -229,12 +267,24 @@ const show2FADialog = ref(false)
 const qrCode = ref('')
 const qrSecret = ref('')
 
+// Force router-view remount on bot switch
+const routerViewKey = ref(0)
+watch(() => botStore.selectedBotId, () => { routerViewKey.value++ })
+
+// Bot change handler
+function onBotChange(botId) {
+  const bot = botStore.bots.find(b => b.id === botId)
+  if (bot) botStore.selectBot(bot)
+}
+
 const pageTitles = {
   '/dashboard': '仪表盘',
   '/groups': '群组管理',
   '/users': '用户管理',
   '/dingshi': '定时消息',
   '/weijinci': '违禁词管理',
+  '/keyword-reply': '关键词回复',
+  '/shop': '积分商城',
   '/lotteries': '抽奖管理',
   '/kuaisufabu': '快速发布',
   '/bot-tokens': 'Bot 克隆',
@@ -272,6 +322,8 @@ function handleLogout() {
   auth.logout()
   router.push('/login')
 }
+
+onMounted(() => { botStore.loadBots() })
 </script>
 
 <style>

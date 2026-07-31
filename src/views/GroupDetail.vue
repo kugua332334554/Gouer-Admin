@@ -169,6 +169,7 @@
             <v-checkbox label="置顶消息" v-model="group.autodelete.pin" density="compact" hide-details @update:model-value="saveAutodelete" />
             <v-checkbox label="头像变更" v-model="group.autodelete.photo" density="compact" hide-details @update:model-value="saveAutodelete" />
             <v-checkbox label="标题变更" v-model="group.autodelete.title" density="compact" hide-details @update:model-value="saveAutodelete" />
+            <v-checkbox label="进退群/踢人" v-model="group.autodelete.join_leave" density="compact" hide-details @update:model-value="saveAutodelete" />
           </v-card-text>
         </v-card>
 
@@ -237,7 +238,7 @@ const group = ref({
   toggle: { enabled: false, open_keyword: '', close_keyword: '' },
   points: { status: false, msg_points: 0, ignore_stickers: true },
   speak_check: { enabled: false, require_last_name: false, require_username: false, require_photo: false, require_premium: false },
-  autodelete: { pin: false, photo: false, title: false },
+  autodelete: { pin: false, photo: false, title: false, join_leave: false },
   card: { enabled: false },
   permission: 'all',
   subscriptions: [],

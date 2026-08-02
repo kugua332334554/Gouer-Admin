@@ -101,6 +101,12 @@
           value="kuaisufabu"
           to="/kuaisufabu"
         />
+        <v-list-item
+          prepend-icon="mdi-clover"
+          title="抽签管理"
+          value="fortunes"
+          to="/fortunes"
+        />
 
         <v-divider class="my-2" />
 
@@ -111,6 +117,12 @@
           title="Bot克隆"
           value="bot-tokens"
           to="/bot-tokens"
+        />
+        <v-list-item
+          prepend-icon="mdi-account-cancel"
+          title="集群黑名单"
+          value="blacklist"
+          to="/blacklist"
         />
         <v-list-item
           prepend-icon="mdi-crown"

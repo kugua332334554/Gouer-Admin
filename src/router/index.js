@@ -80,6 +80,18 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: '/blacklist',
+    name: 'Blacklist',
+    component: () => import('@/views/Blacklist.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/fortunes',
+    name: 'Fortunes',
+    component: () => import('@/views/Fortunes.vue'),
+    meta: { requiresAuth: true },
+  },
+  {
     path: '/channels',
     name: 'Channels',
     component: () => import('@/views/Channels.vue'),

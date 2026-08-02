@@ -38,6 +38,9 @@
               <v-col cols="4"><v-select label="超时惩罚" :items="verifyPenalties" v-model="group.verify.penalty" density="compact" hide-details @update:model-value="saveVerify" /></v-col>
             </v-row>
           </v-card-text>
+          <v-card-text>
+            <v-switch label="禁止红包挂进入(集群黑名单用户禁止加入)" v-model="group.verify.block_blacklist" density="compact" hide-details color="error" @update:model-value="saveVerify" />
+          </v-card-text>
         </v-card>
 
         <!-- Welcome -->
@@ -252,7 +255,7 @@ const chatId = computed(() => Number(route.params.id))
 
 const group = ref({
   chat_id: 0, title: '', username: '', type: '',
-  verify: { status: false, mode: 'button', duration: 1, penalty: 'mute' },
+  verify: { status: false, mode: 'button', duration: 1, penalty: 'mute', block_blacklist: false },
   welcome: { status: false, delete_time: 0, delete_last: false, welcome_text: '' },
   night: { status: false, start_hour: 0, end_hour: 6, notify: true },
   antispam: { enabled: false },
